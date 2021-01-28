@@ -1,13 +1,15 @@
 # AdvCV_P1
 Advanced Computer Vision Project Phase #1
 
-Requires 6.7G ImageNet2012 Validation dataset which can be found here:
-https://academictorrents.com/details/5d6d0df7ed81efd49ca99ea4737e0ae5e3a5f2e5
+## Validation Dataset
+Requires 6.7G ImageNet2012 Validation dataset which can be found (https://academictorrents.com/details/5d6d0df7ed81efd49ca99ea4737e0ae5e3a5f2e5)[here]:
 
-Run Code:
+
+## Run Code:
+``` 
 $ conda activate
 $ python p1.py --help
-usage: Project Phase 1 (PGD). [-h] [--model MODEL] [--PGD PGD] [--epsilon EPSILON]
+ usage: Project Phase 1 (PGD). [-h] [--model MODEL] [--PGD PGD] [--epsilon EPSILON]
                      [--img_dir IMG_DIR] [--batch_size BATCH_SIZE]
 
 optional arguments:
@@ -19,3 +21,4 @@ optional arguments:
   --img_dir IMG_DIR     Directory location of ImageNet validation images
   --batch_size BATCH_SIZE
                         Batch size for testing network
+```
