@@ -34,9 +34,9 @@ def run_main(FLAGS):
     #print(model)
         
     ''' Test Network '''
-    run_test(model, FLAGS)
+    run_test(model, FLAGS, device)
 
-def run_test(model, FLAGS):
+def run_test(model, FLAGS, device):
     batch_size = FLAGS.batch_size
     transform = transforms.Compose([
         transforms.Resize((224,224)),
@@ -45,10 +45,12 @@ def run_test(model, FLAGS):
         ])
 
     dataset = ImageNetDataset(FLAGS.img_dir, transform)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=0)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=4)
 
     correct = 0
     for i, batch in enumerate(dataloader):
+        batch['image'] = batch['image'].to(device)
+        batch['target'] = batch['target'].to(device)
         '''
         batch['image'] is a batch of images (X)
         batch['target'] is a batch of labels (Y)
@@ -59,11 +61,13 @@ def run_test(model, FLAGS):
         predictions = model.forward(batch['image']).argmax(dim=1, keepdim=True)
         # print("predictions", predictions.shape, predictions)
         # print("targets", batch['target'].shape, batch['target'])
+        print("predictions:", predictions)
         correct += predictions.eq(batch['target'].view_as(predictions)).sum().item()
         # if((i+1)%100==0):
         print(i, "Result:", correct, "/", (i+1)*batch_size)
-    print("Result:", correct, "/", i*batch_size)
-    print("Accuracy:", correct/(i*batch_size))
+        break
+    print("Result:", correct, "/", (i+1)*batch_size)
+    print("Accuracy:", correct/((i+1)*batch_size))
 
 if __name__ == '__main__':
     # Set parameters for Sparse Autoencoder
