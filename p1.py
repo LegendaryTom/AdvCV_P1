@@ -49,23 +49,19 @@ def run_test(model, FLAGS, device):
 
     correct = 0
     for i, batch in enumerate(dataloader):
-        batch['image'] = batch['image'].to(device)
-        batch['target'] = batch['target'].to(device)
         '''
         batch['image'] is a batch of images (X)
         batch['target'] is a batch of labels (Y)
         '''
-        # print(i, batch.shape())
-        # print(i, batch['image'].shape)
-        # print(i, batch['target'].shape)
+        batch['image'] = batch['image'].to(device)
+        batch['target'] = batch['target'].to(device)
+
         predictions = model.forward(batch['image']).argmax(dim=1, keepdim=True)
-        # print("predictions", predictions.shape, predictions)
-        # print("targets", batch['target'].shape, batch['target'])
         print("predictions:", predictions)
         correct += predictions.eq(batch['target'].view_as(predictions)).sum().item()
         # if((i+1)%100==0):
         print(i, "Result:", correct, "/", (i+1)*batch_size)
-        break
+        
     print("Result:", correct, "/", (i+1)*batch_size)
     print("Accuracy:", correct/((i+1)*batch_size))
 
