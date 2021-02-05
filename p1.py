@@ -57,9 +57,9 @@ def run_test(model, FLAGS, device):
         batch['target'] = batch['target'].to(device)
 
         predictions = model.forward(batch['image']).argmax(dim=1, keepdim=True)
-        print("predictions:", predictions)
+        
         correct += predictions.eq(batch['target'].view_as(predictions)).sum().item()
-        # if((i+1)%100==0):
+        
         print(i, "Result:", correct, "/", (i+1)*batch_size)
         
     print("Result:", correct, "/", (i+1)*batch_size)

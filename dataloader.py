@@ -29,7 +29,6 @@ class ImageNetDataset(Dataset):
         
         #List of images files in img_dir
         onlyfiles = [f for f in listdir(img_dir) if isfile(join(img_dir, f))]
-
         onlyfiles.sort()
         self.image_names = onlyfiles
         self.labels = pd.read_csv('val.txt', delimiter=' ', names=['target']).to_numpy()
