@@ -29,8 +29,8 @@ source activate pytorch-1.5.1+py38+cuda10.2
 #source activate pytorch-1.2.0+cuda10_0+py36
 conda list | grep torch
 
-#pip install torchnet --user
-#pip install pandas --user
+pip install torchnet --user
+pip install pandas --user
 
 
 echo $PATH
