@@ -38,7 +38,7 @@ echo $PATH
 # Run Program
 echo
 echo "Starting p1.py"
-python p1.py --img_dir='../Data/ImageNet2012/ILSVRC2012_img_val' --batch_size=4
+python p1.py --img_dir='../Data/ImageNet2012/ILSVRC2012_img_val' --batch_size=16
 
 echo
 # You’re done!

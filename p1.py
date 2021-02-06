@@ -38,6 +38,7 @@ class UnNormalize(object):
         return tensor
 
 def run_main(FLAGS):
+    batch_size=FLAGS.batch_size
     # Check if cuda is available
     use_cuda = torch.cuda.is_available()
     
@@ -92,15 +93,15 @@ def run_main(FLAGS):
                 adv_prediction = model.forward(adv_sample)
 
                 #Save adversarial images to disk in PNG format so we get discrete pixel values
-                saved_adv_sample = torch.empty(batch_size, 3, 224, 224)
-                cloned_adv_sample = adv_sample.clone()
+                saved_adv_sample = torch.empty(batch_size, 3, 224, 224).to(device)
+                cloned_adv_sample = adv_sample.clone().to(device)
                 for n in range(batch_size):
                     image_path = "temp/saved_adv.PNG"
                     save_image(inv(cloned_adv_sample[n]), image_path)
                     saved_adv_sample[n] = transform(Image.open(image_path).convert('RGB'))
                 
                 #Predict saved adversarial images
-                saved_adv_pred = model.forward(saved_adv_sample)
+                saved_adv_prediction = model.forward(saved_adv_sample)
                 
                 #Output Results
                 for n in range(batch_size):
@@ -109,18 +110,13 @@ def run_main(FLAGS):
                     adv_pred = adv_prediction.argmax(dim=1, keepdim=True)[n].item() #Model's prediction on adversarial image
                     adv_distance = (((sample[n]-adv_sample[n])**2).mean()**(1/2)).item() #Distance between original and adversarial image
                     
-                    saved_adv_pred = saved_adv_pred.argmax(dim=1, keepdim=True)[n].item() #Model's prediction on saved adversarial image
+                    saved_adv_pred = saved_adv_prediction.argmax(dim=1, keepdim=True)[n].item() #Model's prediction on saved adversarial image
                     saved_adv_distance = (((sample[n]-saved_adv_sample[n])**2).mean()**(1/2)).item() #Distance between original and saved adversarial image
                     result = [FLAGS.model, str(image_number), str(e), str(target[n].item()), str(sample_pred), str(adv_pred), str(saved_adv_pred), str(round(adv_distance, 5)), str(round(saved_adv_distance, 5))]
                     print(",".join(result))
                     results.append(result)
 
         print("len(results):", len(results))
-        
-def predict_image_class(model, sample):
-    prediction = model.forward(sample.unsqueeze(0)).argmax(dim=1, keepdim=True)[0].item()
-    print(prediction)
-    return prediction
 
 def run_test(model, FLAGS, device):
     batch_size = FLAGS.batch_size
@@ -143,20 +139,16 @@ def run_test(model, FLAGS, device):
         batch['target'] = batch['target'].to(device)
         # if(i==10):
         #     break
-        # print(i, batch.shape())
-        # print(i, batch['image'].shape)
-        # print(i, batch['target'].shape)
+
         predictions = model.forward(batch['image']).argmax(dim=1, keepdim=True)
-        # print("predictions", predictions.shape, predictions)
-        # print("targets", batch['target'].shape, batch['target'])
         correct += predictions.eq(batch['target'].view_as(predictions)).sum().item()
-        # if((i+1)%100==0):
+
         print(i, "Result:", correct, "/", (i+1)*batch_size)
     print("Result:", correct, "/", (i+1)*batch_size)
     print("Accuracy:", correct/((i+1)*batch_size))
 
 
-#Taken from: https://towardsdatascience.com/know-your-enemy-7f7c5038bdf3
+#Adapted from: https://towardsdatascience.com/know-your-enemy-7f7c5038bdf3
 def projected_gradient_descent(model, x, y, loss_fn, num_steps, step_size, step_norm, eps, eps_norm, clamp=(0,1), y_target=None):
     """Performs the projected gradient descent attack on a batch of images."""
     x_adv = x.clone().detach().requires_grad_(True).to(x.device)
@@ -232,7 +224,7 @@ if __name__ == '__main__':
                         help='(resnet or vgg) Select VGG or ResNet model.')
     parser.add_argument('--PGD',
                         type=str,
-                        default='off',
+                        default='on',
                         help='(on or off) Whether to use adversarial images created with PGD or original imagenet images.')
     parser.add_argument('--epsilon',
                         type=int, 
@@ -244,7 +236,7 @@ if __name__ == '__main__':
                         help='Directory location of ImageNet validation images')
     parser.add_argument('--batch_size',
                         type=int, 
-                        default=10,
+                        default=8,
                         help='Batch size for testing network')
 
     
