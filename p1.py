@@ -135,17 +135,6 @@ def run_main(FLAGS):
                 
                 #Output Results
                 for n in range(batch_size):
-                    # if(n < 2):
-                        # plt.imshow(sample[n].clone().detach().squeeze().permute(1, 2, 0))
-                        # plt.show()
-                        # plt.imshow((sample[n]-adv_sample[n]).detach().squeeze().permute(1, 2, 0)*10)
-                        # plt.show()
-                        # plt.imshow(adv_sample[n].clone().detach().squeeze().permute(1, 2, 0))
-                        # plt.show()
-                        # plt.imshow((adv_sample[n]-saved_adv_sample[n]).detach().squeeze().permute(1, 2, 0)*100/(2*e))
-                        # plt.show()
-                        # plt.imshow(saved_adv_sample[n].clone().detach().squeeze().permute(1, 2, 0))
-                        # plt.show()
                     image_number = (i*batch_size)+n+1
                     sample_pred = prediction.argmax(dim=1, keepdim=True)[n].item() #Model's prediction on original image
                     
@@ -161,10 +150,8 @@ def run_main(FLAGS):
                     single_sample_loss = round(loss(prediction[n].unsqueeze(0), target[n].unsqueeze(0)).item(), 6) #Loss for original training sample
                     single_adv_loss = round(loss(adv_prediction[n].unsqueeze(0), target[n].unsqueeze(0)).item(), 6) #Loss for adversarial image
                     single_saved_adv_loss = round(loss(saved_adv_prediction[n].unsqueeze(0), target[n].unsqueeze(0)).item(), 6) #Loss for saved adversarial image
-                    # if(round(adv_L2_distance, 6)!=round(adv_Linf_distance, 6)):
-                    #     print("L2 Difference:")
-                    # if(round(saved_adv_L2_distance, 6)!=round(saved_adv_Linf_distance, 6)):
-                    #     print("Linf Difference:")
+
+                    
                     result = [
                         FLAGS.model, 
                         str(image_number), 
@@ -200,16 +187,12 @@ def run_test(model, FLAGS, device):
 
     correct = 0
     for i, batch in enumerate(dataloader):
-        if(i > 4):
-            break
         '''
         batch['image'] is a batch of images (X)
         batch['target'] is a batch of labels (Y)
         '''
         batch['image'] = batch['image'].to(device)
         batch['target'] = batch['target'].to(device)
-        # if(i==10):
-        #     break
 
         predictions = model.forward(batch['image']).argmax(dim=1, keepdim=True)
         correct += predictions.eq(batch['target'].view_as(predictions)).sum().item()
@@ -371,7 +354,7 @@ if __name__ == '__main__':
                         help='Directory location of ImageNet validation images')
     parser.add_argument('--batch_size',
                         type=int, 
-                        default=32,
+                        default=8,
                         help='Batch size for testing network')
     parser.add_argument('--save_img',
                         type=int, 
