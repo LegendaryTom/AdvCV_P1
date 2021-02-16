@@ -7,8 +7,9 @@ Created on Tue Jan 26 2021
 from os import listdir
 from os.path import isfile, join
 import pandas as pd
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from PIL import Image
+import numpy as np
 
 class ImageNetDataset(Dataset):
     """Custom dataset for loading ImageNet Dataset.
@@ -52,9 +53,9 @@ class ImageNetDataset(Dataset):
         target = self.labels[index]
 
         if self.transform is not None:
-            img = self.transform(img)
+            img_normalized = self.transform(img)
 
-        return {"image":img, "target":target}
+        return {"image":img_normalized, "target":target, "raw":np.asarray(img)}
         
         
     

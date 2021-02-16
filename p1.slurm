@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --time=24:00:00
+#SBATCH --time=12:00:00
 #SBATCH --gpus=1
 #SBATCH --cpus-per-gpu=2
 #SBATCH --gres-flags=enforce-binding
@@ -31,6 +31,7 @@ conda list | grep torch
 
 pip install torchnet --user
 pip install pandas --user
+pip install advertorch --user
 
 
 echo $PATH
@@ -38,7 +39,11 @@ echo $PATH
 # Run Program
 echo
 echo "Starting p1.py"
-python p1.py --img_dir='../Data/ImageNet2012/ILSVRC2012_img_val' --batch_size=16
+
+python p1.py --img_dir='../Data/ImageNet2012/ILSVRC2012_img_val' --batch_size=32 --model=resnet --num_workers=8 --PGD=on --norm=inf
+python p1.py --img_dir='../Data/ImageNet2012/ILSVRC2012_img_val' --batch_size=32 --model=resnet --num_workers=8 --PGD=on --norm=2
+python p1.py --img_dir='../Data/ImageNet2012/ILSVRC2012_img_val' --batch_size=32 --model=vgg --num_workers=8 --PGD=on --norm=inf
+python p1.py --img_dir='../Data/ImageNet2012/ILSVRC2012_img_val' --batch_size=32 --model=vgg --num_workers=8 --PGD=on --norm=2
 
 echo
 # You’re done!
